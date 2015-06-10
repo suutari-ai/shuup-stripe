@@ -11,6 +11,7 @@ INSTALLED_APPS = (
     "easy_thumbnails",
     "filer",
     "shoop.core",
+    "shoop.front",
     "shoop.simple_pricing",
     "shoop.default_tax",
     "shoop_stripe",
@@ -37,3 +38,15 @@ class DisableMigrations(object):
 
 MIGRATION_MODULES = DisableMigrations()
 MEDIA_ROOT = os.path.join(os.path.dirname(__file__), "var", "media")
+
+TEMPLATES = [
+    {
+        "BACKEND": "django_jinja.backend.Jinja2",
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "match_extension": ".jinja",
+            "newstyle_gettext": True,
+        },
+        "NAME": "jinja2",
+    },
+]
