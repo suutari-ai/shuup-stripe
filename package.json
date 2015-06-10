@@ -1,0 +1,9 @@
+{
+  "name": "shoop-stripe",
+  "version": "0.1.0",
+  "description": "Shoop Stripe integration",
+  "scripts": {
+    "test": "py.test -vvv --cov shoop_stripe --cov-report html shoop_stripe_tests"
+  },
+  "license": "AGPL-3.0"
+}
