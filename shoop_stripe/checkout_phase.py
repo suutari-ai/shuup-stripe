@@ -11,11 +11,12 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
 from shoop.front.checkout import CheckoutPhaseViewMixin
+from shoop.utils.excs import Problem
 from .utils import get_amount_info
 
 
 class StripeTokenForm(forms.Form):
-    # Camel case only as that's what Stripe does
+    # We're using camel case here only because that's what Stripe does
     stripeToken = forms.CharField(widget=forms.HiddenInput, required=True)
     stripeTokenType = forms.CharField(widget=forms.HiddenInput, required=False)
     stripeEmail = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -30,8 +31,13 @@ class StripeCheckoutPhase(CheckoutPhaseViewMixin, FormView):
 
     def get_stripe_context(self):
         options = self.module.get_options()
+        publishable_key = options.get("publishable_key")
+        secret_key = options.get("secret_key")
+        if not (publishable_key and secret_key):
+            raise Problem(_("Please configure Stripe keys for method %s.") % self.module.method)
+
         config = {
-            "publishable_key": options["publishable_key"],
+            "publishable_key": publishable_key,
             "name": force_text(self.request.shop),
             "description": force_text(_("Purchase")),
         }
