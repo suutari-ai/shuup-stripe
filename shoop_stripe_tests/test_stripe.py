@@ -27,6 +27,9 @@ def stripe_payment_module():
     sk = os.environ.get("STRIPE_SECRET_KEY")
     if not sk:
         pytest.skip("Can't test Stripe without STRIPE_SECRET_KEY envvar")
+    if "test" not in sk:
+        pytest.skip("STRIPE_SECRET_KEY is not a test key")
+
     return StripeCheckoutModule(None, {
         "publishable_key": "x",
         "secret_key": sk
@@ -38,10 +41,10 @@ def _create_order_for_stripe():
     supplier = get_default_supplier()
     order = create_order_with_product(
         product=product, supplier=supplier, quantity=1,
-        taxless_unit_price=100, tax_rate=0
+        taxless_base_unit_price=100, tax_rate=0
     )
     order.cache_prices()
-    assert order.taxless_total_price > 0
+    assert order.taxless_total_price.value > 0
     if not order.payment_data:
         order.payment_data = {}
     order.save()
@@ -98,8 +101,7 @@ def test_stripe_checkout_phase(rf, stripe_payment_module):
     request.shop = get_default_shop()
     request.session = {}
     request.basket = get_basket(request)
-    checkout_phase = StripeCheckoutPhase(request=request)
-    checkout_phase.module = stripe_payment_module
+    checkout_phase = StripeCheckoutPhase(request=request, module=stripe_payment_module)
     assert not checkout_phase.is_valid()  # We can't be valid just yet
     context = checkout_phase.get_context_data()
     assert context["stripe"]
@@ -115,3 +117,15 @@ def test_stripe_checkout_phase(rf, stripe_payment_module):
     assert request.session  # And things should've been saved into the session
     checkout_phase.process()  # And this should do things to the basket
     assert request.basket.payment_data.get("stripe")
+
+
+@pytest.mark.django_db
+def test_stripe_checkout_phase_with_misconfigured_module(rf):
+    stripe_payment_module = StripeCheckoutModule(None, {})
+    request = rf.get("/")
+    request.shop = get_default_shop()
+    request.session = {}
+    request.basket = get_basket(request)
+    checkout_phase = StripeCheckoutPhase(request=request, module=stripe_payment_module)
+    with pytest.raises(Problem):
+        checkout_phase.get_context_data()
