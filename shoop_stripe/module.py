@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-# This file is part of Shoop.
+# This file is part of Shoop Stripe Addon.
 #
-# Copyright (c) 2012-2015, Shoop Ltd. All rights reserved.
+# Copyright (c) 2012-2016, Shoop Ltd. All rights reserved.
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
 
-from django import forms
-from shoop.core.methods.base import BasePaymentMethodModule
-from shoop_stripe.checkout_phase import StripeCheckoutPhase
-from shoop_stripe.utils import get_amount_info
+from django.utils.translation import ugettext as _
+
 from shoop.utils.excs import Problem
 from shoop.utils.http import retry_request
+
+from shoop_stripe.utils import get_amount_info
 
 
 def _handle_stripe_error(charge_data):
@@ -35,8 +35,8 @@ class StripeCharger(object):
         stripe_token = self.order.payment_data["stripe"]["token"]
         input_data = {
             "source": stripe_token,
-            "description": "Payment for %s self.order %s" % (
-                self.order.shop, self.order.identifier
+            "description": _("Payment for order {id} on {shop}").format(
+                id=self.order.identifier, shop=self.order.shop,
             ),
         }
         input_data.update(get_amount_info(self.order.taxful_total_price))
@@ -64,35 +64,3 @@ class StripeCharger(object):
             payment_identifier="Stripe-%s" % charge_data["id"],
             description="Stripe Charge"
         )
-
-
-class StripeCheckoutModule(BasePaymentMethodModule):
-    identifier = "stripe"
-    name = "Stripe Checkout"
-    option_fields = BasePaymentMethodModule.option_fields + [
-        (
-            "secret_key",
-            forms.CharField(
-                label="Secret Key",
-                required=True,
-                widget=forms.PasswordInput(render_value=True)
-            )
-        ),
-        (
-            "publishable_key",
-            forms.CharField(
-                label="Publishable Key",
-                required=True,
-                widget=forms.PasswordInput(render_value=True)
-            )
-        ),
-    ]
-    checkout_phase_class = StripeCheckoutPhase
-
-    def process_payment_return_request(self, order, request):
-        if not order.is_paid():
-            charger = StripeCharger(
-                order=order,
-                secret_key=self.get_options()["secret_key"]
-            )
-            charger.create_charge()
