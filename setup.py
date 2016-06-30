@@ -4,7 +4,7 @@ import setuptools
 if __name__ == '__main__':
     setuptools.setup(
         name="shoop-stripe",
-        version="0.1.2",
+        version="0.2.0",
         description="Stripe Checkout integration for Shoop",
         packages=["shoop_stripe"],
         include_package_data=True,
