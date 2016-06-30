@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# This file is part of Shoop Stripe Addon.
+# This file is part of Shuup Stripe Addon.
 #
-# Copyright (c) 2012-2016, Shoop Ltd. All rights reserved.
+# Copyright (c) 2012-2016, Shoop Commerce Ltd. All rights reserved.
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
@@ -10,10 +10,10 @@ from django import forms
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
-from shoop.front.checkout import (
+from shuup.front.checkout import (
     BasicServiceCheckoutPhaseProvider, CheckoutPhaseViewMixin
 )
-from shoop.utils.excs import Problem
+from shuup.utils.excs import Problem
 
 from .models import StripeCheckoutPaymentProcessor
 from .utils import get_amount_info
@@ -30,7 +30,7 @@ class StripeCheckoutPhase(CheckoutPhaseViewMixin, FormView):
     service = None  # Injected by the method phase
     identifier = "stripe"
     title = "Stripe"
-    template_name = "shoop/stripe/checkout_phase.jinja"
+    template_name = "shuup/stripe/checkout_phase.jinja"
     form_class = StripeTokenForm
 
     def get_stripe_context(self):

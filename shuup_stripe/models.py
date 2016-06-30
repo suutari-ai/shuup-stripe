@@ -1,6 +1,6 @@
-# This file is part of Shoop Stripe Addon.
+# This file is part of Shuup Stripe Addon.
 #
-# Copyright (c) 2012-2016, Shoop Ltd. All rights reserved.
+# Copyright (c) 2012-2016, Shoop Commerce Ltd. All rights reserved.
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from shoop.core.models import PaymentProcessor, ServiceChoice
+from shuup.core.models import PaymentProcessor, ServiceChoice
 
 from .module import StripeCharger
 

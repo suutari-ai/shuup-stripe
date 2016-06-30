@@ -1,4 +1,4 @@
 include README.md
 include LICENSE
 
-recursive-include shoop_stripe *.jinja
+recursive-include shuup_stripe *.jinja

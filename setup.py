@@ -3,11 +3,11 @@ import setuptools
 
 if __name__ == '__main__':
     setuptools.setup(
-        name="shoop-stripe",
+        name="shuup-stripe",
         version="0.2.0",
-        description="Stripe Checkout integration for Shoop",
-        packages=["shoop_stripe"],
+        description="Stripe Checkout integration for Shuup",
+        packages=["shuup_stripe"],
         include_package_data=True,
-        install_requires=["shoop>=4.0,<5.0"],
-        entry_points={"shoop.addon": "shoop_stripe=shoop_stripe"}
+        install_requires=["shuup>=0.4"],
+        entry_points={"shuup.addon": "shuup_stripe=shuup_stripe"}
     )

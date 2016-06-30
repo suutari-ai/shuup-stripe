@@ -10,12 +10,12 @@ INSTALLED_APPS = (
     "django.contrib.contenttypes",
     "easy_thumbnails",
     "filer",
-    "shoop.core",
-    "shoop.customer_group_pricing",
-    "shoop.campaigns",
-    "shoop.front",
-    "shoop.default_tax",
-    "shoop_stripe",
+    "shuup.core",
+    "shuup.customer_group_pricing",
+    "shuup.campaigns",
+    "shuup.front",
+    "shuup.default_tax",
+    "shuup_stripe",
 )
 
 DATABASES = {
@@ -23,7 +23,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(
             tempfile.gettempdir(),
-            'shoop_stripe_tests.sqlite3'
+            'shuup_stripe_tests.sqlite3'
         ),
     }
 }

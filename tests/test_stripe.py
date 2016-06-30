@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# This file is part of Shoop Stripe Addon.
+# This file is part of Shuup Stripe Addon.
 #
-# Copyright (c) 2012-2016, Shoop Ltd. All rights reserved.
+# Copyright (c) 2012-2016, Shoop Commerce Ltd. All rights reserved.
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
@@ -9,18 +9,18 @@ from django.utils.timezone import now
 import os
 
 import pytest
-from shoop.front.basket import get_basket
-from shoop.utils.excs import Problem
-from shoop.testing.factories import (
+from shuup.front.basket import get_basket
+from shuup.utils.excs import Problem
+from shuup.testing.factories import (
     get_default_product,
     get_default_supplier,
     get_default_tax_class,
     create_order_with_product,
     get_default_shop)
-from shoop.utils.http import retry_request
+from shuup.utils.http import retry_request
 
-from shoop_stripe.checkout_phase import StripeCheckoutPhase
-from shoop_stripe.models import StripeCheckoutPaymentProcessor
+from shuup_stripe.checkout_phase import StripeCheckoutPhase
+from shuup_stripe.models import StripeCheckoutPaymentProcessor
 
 
 @pytest.fixture
