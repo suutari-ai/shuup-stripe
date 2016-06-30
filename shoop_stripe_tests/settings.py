@@ -11,8 +11,9 @@ INSTALLED_APPS = (
     "easy_thumbnails",
     "filer",
     "shoop.core",
+    "shoop.customer_group_pricing",
+    "shoop.campaigns",
     "shoop.front",
-    "shoop.simple_pricing",
     "shoop.default_tax",
     "shoop_stripe",
 )

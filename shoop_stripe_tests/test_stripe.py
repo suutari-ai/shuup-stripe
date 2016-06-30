@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# This file is part of Shoop.
+# This file is part of Shoop Stripe Addon.
 #
-# Copyright (c) 2012-2015, Shoop Ltd. All rights reserved.
+# Copyright (c) 2012-2016, Shoop Ltd. All rights reserved.
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
@@ -11,38 +11,40 @@ import os
 import pytest
 from shoop.front.basket import get_basket
 from shoop.utils.excs import Problem
-from shoop_tests.utils import printable_gibberish, apply_request_middleware
-from shoop_stripe.checkout_phase import StripeCheckoutPhase
-from shoop_stripe.module import StripeCheckoutModule
 from shoop.testing.factories import (
     get_default_product,
     get_default_supplier,
+    get_default_tax_class,
     create_order_with_product,
     get_default_shop)
 from shoop.utils.http import retry_request
 
+from shoop_stripe.checkout_phase import StripeCheckoutPhase
+from shoop_stripe.models import StripeCheckoutPaymentProcessor
+
 
 @pytest.fixture
-def stripe_payment_module():
+def stripe_payment_processor():
     sk = os.environ.get("STRIPE_SECRET_KEY")
     if not sk:
         pytest.skip("Can't test Stripe without STRIPE_SECRET_KEY envvar")
     if "test" not in sk:
         pytest.skip("STRIPE_SECRET_KEY is not a test key")
 
-    return StripeCheckoutModule(None, {
-        "publishable_key": "x",
-        "secret_key": sk
-    })
+    return StripeCheckoutPaymentProcessor.objects.create(
+        secret_key=sk, publishable_key="x")
 
 
-def _create_order_for_stripe():
+def _create_order_for_stripe(stripe_payment_processor):
     product = get_default_product()
     supplier = get_default_supplier()
     order = create_order_with_product(
         product=product, supplier=supplier, quantity=1,
         taxless_base_unit_price=100, tax_rate=0
     )
+    payment_method = stripe_payment_processor.create_service(
+        None, shop=order.shop, tax_class=get_default_tax_class(), enabled=True)
+    order.payment_method = payment_method
     order.cache_prices()
     assert order.taxless_total_price.value > 0
     if not order.payment_data:
@@ -51,11 +53,11 @@ def _create_order_for_stripe():
     return order
 
 
-def get_stripe_token(stripe_payment_module):
+def get_stripe_token(stripe_payment_processor):
     return retry_request(
         method="post",
         url="https://api.stripe.com/v1/tokens",
-        auth=(stripe_payment_module.options["secret_key"], "x"),
+        auth=(stripe_payment_processor.secret_key, "x"),
         data={
             "card[number]": "4242424242424242",
             "card[exp_month]": 12,
@@ -68,45 +70,52 @@ def get_stripe_token(stripe_payment_module):
 ##############################################################################
 
 @pytest.mark.django_db
-def test_stripe_basics(rf, stripe_payment_module):
+def test_stripe_basics(rf, stripe_payment_processor):
     """
     :type rf: RequestFactory
     :type stripe_payment_module: StripeCheckoutModule
     """
-    order = _create_order_for_stripe()
-    token = get_stripe_token(stripe_payment_module)
+    order = _create_order_for_stripe(stripe_payment_processor)
+    token = get_stripe_token(stripe_payment_processor)
     token_id = token["id"]
     order.payment_data["stripe"] = {"token": token_id}
     order.save()
-    stripe_payment_module.process_payment_return_request(order, rf.post("/"))
+    service = order.payment_method
+    stripe_payment_processor.process_payment_return_request(
+        service, order, rf.post("/"))
     assert order.is_paid()
     assert order.payments.first().payment_identifier.startswith("Stripe-")
 
 
 @pytest.mark.django_db
-def test_stripe_bogus_data_fails(rf, stripe_payment_module):
-    order = _create_order_for_stripe()
-    order.payment_data["stripe"] = {"token": printable_gibberish(30)}
+def test_stripe_bogus_data_fails(rf, stripe_payment_processor):
+    order = _create_order_for_stripe(stripe_payment_processor)
+    order.payment_data["stripe"] = {"token": "ugubugudugu"}
     order.save()
     with pytest.raises(Problem):
-        stripe_payment_module.process_payment_return_request(
+        stripe_payment_processor.process_payment_return_request(
+            order.payment_method,
             order,
             rf.post("/")
         )
 
 
 @pytest.mark.django_db
-def test_stripe_checkout_phase(rf, stripe_payment_module):
+def test_stripe_checkout_phase(rf, stripe_payment_processor):
     request = rf.get("/")
     request.shop = get_default_shop()
     request.session = {}
     request.basket = get_basket(request)
-    checkout_phase = StripeCheckoutPhase(request=request, module=stripe_payment_module)
+    service = stripe_payment_processor.create_service(
+        None, shop=request.shop, tax_class=get_default_tax_class(),
+        enabled=True)
+    checkout_phase = StripeCheckoutPhase(
+        request=request, service=service)
     assert not checkout_phase.is_valid()  # We can't be valid just yet
     context = checkout_phase.get_context_data()
     assert context["stripe"]
     request.method = "POST"
-    token = get_stripe_token(stripe_payment_module)
+    token = get_stripe_token(stripe_payment_processor)
     request.POST = {
         "stripeToken": token["id"],
         "stripeTokenType": token["type"],
@@ -121,11 +130,16 @@ def test_stripe_checkout_phase(rf, stripe_payment_module):
 
 @pytest.mark.django_db
 def test_stripe_checkout_phase_with_misconfigured_module(rf):
-    stripe_payment_module = StripeCheckoutModule(None, {})
+    stripe_payment_prossor = (
+        StripeCheckoutPaymentProcessor.objects.create())
     request = rf.get("/")
     request.shop = get_default_shop()
     request.session = {}
     request.basket = get_basket(request)
-    checkout_phase = StripeCheckoutPhase(request=request, module=stripe_payment_module)
+    service = stripe_payment_prossor.create_service(
+        None, shop=request.shop, tax_class=get_default_tax_class(),
+        enabled=True)
+    checkout_phase = StripeCheckoutPhase(
+        request=request, service=service)
     with pytest.raises(Problem):
         checkout_phase.get_context_data()
