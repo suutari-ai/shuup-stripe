@@ -20,6 +20,9 @@ class ShuupStripeAppConfig(AppConfig):
         "service_provider_admin_form": [
             "shuup_stripe.admin_forms:StripeCheckoutAdminForm",
         ],
+        "payment_processor_wizard_form_def": [
+            "shuup_stripe.admin_forms:StripeCheckoutWizardFormDef",
+        ]
     }
 
 
