@@ -1,7 +1,7 @@
 {% extends "shuup/front/checkout/_base.jinja" %}
 
-{% block content %}
-<form role="form" method="post" action="">
+{% block checkout_phase_content %}
+<form role="form" method="post" action="{{ url('shuup:checkout', phase="payment") }}">
     {% csrf_token %}
     <div class="row">
         <div class="col-md-12 text-center">
