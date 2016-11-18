@@ -17,6 +17,7 @@ INSTALLED_APPS = (
     "shuup.default_tax",
     "shuup_stripe",
     "shuup.testing",
+    "shuup.notify",
 )
 
 DATABASES = {
