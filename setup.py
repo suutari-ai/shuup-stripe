@@ -4,7 +4,7 @@ import setuptools
 if __name__ == '__main__':
     setuptools.setup(
         name="shuup-stripe",
-        version="0.4.1",
+        version="0.4.2",
         description="Stripe Checkout integration for Shuup",
         packages=setuptools.find_packages(),
         include_package_data=True,
