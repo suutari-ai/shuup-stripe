@@ -1,15 +1,17 @@
 {% from "shuup/admin/service_providers/wizard_macros.jinja" import service_provider_section %}
+{% set form = pane.forms[form_def.name] %}
 
 {% call service_provider_section(
     identifier=form_def.name,
     header="Stripe",
-    description=gettext("Accept credit cards using <a target='_blank' href='%(url)s'>Stripe</a>", url="https://stripe.com/")
+    description=gettext("Accept credit cards using <a target='_blank' href='%(url)s'>Stripe</a>", url="https://stripe.com/"),
+    is_active = form.is_active()
 )%}
-    {% set form = pane.forms[form_def.name] %}
     <input type="hidden" name="{{ form.name.html_name }}" value="Stripe">
+    {{ bs3.field(form.service_name) }}
     {{ bs3.field(form.secret_key) }}
     {{ bs3.field(form.publishable_key) }}
     <p class="text-center">
-        {% trans %}Don't have an account?{% endtrans %} <a target="_blank" href='https://dashboard.stripe.com/register'>{% trans %}Register now{% endtrans %}</a>.
+        {% trans %}Don't have a Stripe account?{% endtrans %} <a target="_blank" href='https://dashboard.stripe.com/register'>{% trans %}Register now{% endtrans %}</a>.
     </p>
 {% endcall %}
