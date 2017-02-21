@@ -25,5 +25,4 @@ class ShuupStripeAppConfig(AppConfig):
         ]
     }
 
-
 default_app_config = "shuup_stripe.ShuupStripeAppConfig"

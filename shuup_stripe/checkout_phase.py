@@ -5,25 +5,17 @@
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
-
-from django import forms
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
-from shuup.front.checkout import (
-    BasicServiceCheckoutPhaseProvider, CheckoutPhaseViewMixin
-)
+
+from shuup.front.checkout import (BasicServiceCheckoutPhaseProvider,
+                                  CheckoutPhaseViewMixin)
 from shuup.utils.excs import Problem
 
+from .checkout_forms import StripeTokenForm
 from .models import StripeCheckoutPaymentProcessor
 from .utils import get_amount_info
-
-
-class StripeTokenForm(forms.Form):
-    # We're using camel case here only because that's what Stripe does
-    stripeToken = forms.CharField(widget=forms.HiddenInput, required=True)
-    stripeTokenType = forms.CharField(widget=forms.HiddenInput, required=False)
-    stripeEmail = forms.CharField(widget=forms.HiddenInput, required=False)
 
 
 class StripeCheckoutPhase(CheckoutPhaseViewMixin, FormView):
