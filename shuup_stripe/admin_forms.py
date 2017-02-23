@@ -5,14 +5,11 @@
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
 from django import forms
-
 from shuup.admin.forms import ShuupAdminForm
 from shuup.admin.modules.service_providers.wizard_form_defs import (
-    ServiceWizardFormDef
-)
+    ServiceWizardFormDef)
 from shuup.admin.modules.service_providers.wizard_forms import (
-    ServiceWizardForm
-)
+    ServiceWizardForm)
 
 from .models import StripeCheckoutPaymentProcessor
 
