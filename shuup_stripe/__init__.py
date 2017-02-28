@@ -8,6 +8,8 @@
 
 from shuup.apps import AppConfig
 
+__version__ = '0.4.2'
+
 
 class ShuupStripeAppConfig(AppConfig):
     name = "shuup_stripe"
