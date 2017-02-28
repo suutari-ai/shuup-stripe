@@ -12,7 +12,7 @@ for the `Shuup <https://shuup.com/>`__ platform.
 Copyright
 ---------
 
-Copyright (c) 2012-2016 by Shoop Commerce Ltd. <contact@shuup.com>
+Copyright (c) 2012-2017 by Shoop Commerce Ltd. <contact@shuup.com>
 
 Shuup is International Registered Trademark & Property of Shoop Commerce Ltd.,
 Business ID: FI24815722, Business Address: Aurakatu 12 B, 20100 Turku,
