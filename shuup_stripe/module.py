@@ -7,7 +7,6 @@
 # LICENSE file in the root directory of this source tree.
 
 from django.utils.translation import ugettext as _
-
 from shuup.utils.excs import Problem
 from shuup.utils.http import retry_request
 

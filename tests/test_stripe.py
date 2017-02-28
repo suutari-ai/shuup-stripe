@@ -5,18 +5,15 @@
 #
 # This source code is licensed under the AGPLv3 license found in the
 # LICENSE file in the root directory of this source tree.
-from django.utils.timezone import now
 import os
 
 import pytest
+from django.utils.timezone import now
 from shuup.front.basket import get_basket
-from shuup.utils.excs import Problem
 from shuup.testing.factories import (
-    get_default_product,
-    get_default_supplier,
-    get_default_tax_class,
-    create_order_with_product,
-    get_default_shop)
+    create_order_with_product, get_default_product, get_default_shop,
+    get_default_supplier, get_default_tax_class)
+from shuup.utils.excs import Problem
 from shuup.utils.http import retry_request
 
 from shuup_stripe.checkout_phase import StripeCheckoutPhase
