@@ -1,5 +1,3 @@
---extra-index-url https://shuup.github.io/pypi/simple/ shuup
-
 coveralls
 pytest>=2.8
 pytest-cov
